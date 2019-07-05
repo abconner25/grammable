@@ -3,8 +3,24 @@ require 'rails_helper'
 RSpec.describe GramsController, type: :controller do
 
   describe "grams#destroy action" do
+    it "should not let a user destroy other users grams" do
+      gram = FactoryBot.create(:gram)
+      user = FactoryBot.create(:user)
+      sign_in user
+
+      delete :destroy, params: {id: gram.id}
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it "should only allow signed in users to destroy a gram" do
+      gram = FactoryBot.create(:gram)
+      delete :destroy, params: {id: gram.id}
+      expect(response).to redirect_to new_user_session_path
+    end
+
     it "should allow a user to destroy grams" do
       gram = FactoryBot.create(:gram)
+      sign_in gram.user
       delete :destroy, params: {id: gram.id}
       expect(response).to redirect_to root_path
       gram = Gram.find_by_id(gram.id)
@@ -12,14 +28,32 @@ RSpec.describe GramsController, type: :controller do
     end
 
     it "should return a 404 error if the gram cant be found" do
+      user = FactoryBot.create(:user)
+      sign_in user
       delete :destroy, params: {id: 'false'}
       expect(response).to have_http_status(:not_found)
     end
   end
 
   describe "gram#update action" do
+    it "should not let a user update other users grams" do
+      gram = FactoryBot.create(:gram)
+      user = FactoryBot.create(:user)
+      sign_in user
+
+      patch :update, params: {id: gram.id, gram: {message: 'changed'}}
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it "should only allow signed in users to update a gram" do
+      gram = FactoryBot.create(:gram)
+      patch :update, params: {id: gram.id, gram: {message: 'changed'}}
+      expect(response).to redirect_to new_user_session_path
+    end
+
     it "should allow users to successfully update grams" do
       gram = FactoryBot.create(:gram, message: "initial value")
+      sign_in gram.user
       patch :update, params: {id: gram.id, gram: {message: 'changed'}}
       expect(response).to redirect_to root_path
       gram.reload
@@ -27,12 +61,15 @@ RSpec.describe GramsController, type: :controller do
     end
 
     it "should return a 404 error if the gram cant be found" do
+      user = FactoryBot.create(:user)
+      sign_in user
       patch :update, params: {id: 'false', gram: {message: 'changed'}}
       expect(response).to have_http_status(:not_found)
     end 
 
     it "should render the edit form with an http status of unprocessable_entity" do
       gram = FactoryBot.create(:gram, message: 'initial value')
+      sign_in gram.user
       patch :update, params: {id: gram.id, gram: {message: ''}}
       expect(response).to have_http_status(:unprocessable_entity)
       gram.reload
@@ -40,13 +77,31 @@ RSpec.describe GramsController, type: :controller do
     end
   end
   describe "grams#edit action" do
+    it "should not let a user edit other users grams" do
+      gram = FactoryBot.create(:gram)
+      user = FactoryBot.create(:user)
+      sign_in user
+
+      get :edit, params: {id: gram.id}
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it "should only allow signed in users to edit a gram" do
+      gram = FactoryBot.create(:gram)
+      get :edit, params: {id: gram.id}
+      expect(response).to redirect_to new_user_session_path
+    end
+
     it "should successfully show the edit form if the gram is found" do
       gram = FactoryBot.create(:gram)
+      sign_in gram.user
       get :edit, params: { id: gram.id}
       expect(response).to have_http_status(:success)
     end
 
     it "should return 404 error if gram is not found" do
+      user = FactoryBot.create(:user)
+      sign_in user
       get :edit, params: {id: 'false'}
       expect(response).to have_http_status(:not_found)
     end
