@@ -43,6 +43,7 @@ class GramsController < ApplicationController
   end
 
   def destroy
+    puts "youre in the destory function =============================="
     @gram = Gram.find_by_id(params[:id])
     return render_status(:not_found) if @gram.blank?
     return render_status(:forbidden) if @gram.user != current_user
