@@ -20,8 +20,10 @@
         </div>
         <div class="add float-right">
           <% if current_user %>
-            You're signed in as <%= current_user.email %>.
+            You're signed in as <%= current_user.email %> .
             <%= link_to "new post", new_gram_path %>
+          
+
             <%= link_to "Sign out", destroy_user_session_path, method: :delete %>
           <% else %>
             <%= link_to "Sign In", new_user_session_path %>
