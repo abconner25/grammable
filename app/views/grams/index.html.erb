@@ -1,4 +1,4 @@
-<div class="col-10 offset-1 col-sm-8 offset-sm-2 cold-md-6 offset-md-3">
+<div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3">
   <% @grams.each do |gram| %>
     <div class="card">
       <div class="handle"><%= gram.user.email %></div>
@@ -6,6 +6,7 @@
       <p>
         <%= gram.message %>
       </p>
+
       <div class="gram-actions float-right">
         <% if current_user && current_user == gram.user %>
           <%= link_to 'Edit', edit_gram_path(gram) %>
